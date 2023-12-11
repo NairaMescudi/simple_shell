@@ -70,7 +70,7 @@ int main(__attribute__((unused))int argc, char **argv)
 	ssize_t bytesR = 0, cmd_count = 0;
 	size_t n;
 	char *line = NULL, **tokens = NULL;
-	int exitCode;
+	int lastExitCode = 0;
 
 	while (1)
 	{
@@ -83,20 +83,17 @@ int main(__attribute__((unused))int argc, char **argv)
 		if (bytesR == -1) /* errors and EOF */
 		{
 			free(line);
-			/**freeTokens(tokens);*/
 			if (isatty(STDIN_FILENO))
 				printf("\n");
-			exit(EXIT_FAILURE);
+			exit(lastExitCode);
 		}
 		line[bytesR - 1] = '\0';		
 		tokens = tokenizer(line, " ");
 		if (!tokens)
 			continue;
-		exitCode = executeCommand(tokens, argv, cmd_count);
-		if (exitCode != 0)
-		{
-			printf("Command exited with status %d\n", exitCode);
-		}
+		if (strcmp(tokens[0], "exit") == 0)
+			exit(lastExitCode);
+		lastExitCode = executeCommand(tokens, argv, cmd_count);
 		freeTokens(tokens);
 	}
 	free(line);
@@ -107,16 +104,20 @@ int main(__attribute__((unused))int argc, char **argv)
 int executeCommand(char **tokens, char **argv, size_t cmd_count)
 {
 	pid_t pid;
-	int status;
+	int status, exitCode;
 
 	if (!tokens || !tokens[0])
 		return (0);
 
 	if (access(tokens[0], X_OK) == -1)
 	{
-		fprintf(stderr, "%s: %ld: %s not found\n", argv[0], cmd_count,
-				tokens[0]);
-		return (1);
+		get_path(&tokens[0]);
+		if (tokens && access(tokens[0], X_OK) == -1)
+		{
+			fprintf(stderr, "%s: %ld: %s: not found\n",
+					argv[0], cmd_count, tokens[0]);
+			return (127);
+		}
 	}
 
 	pid = fork();
@@ -131,11 +132,45 @@ int executeCommand(char **tokens, char **argv, size_t cmd_count)
 		if (execve(tokens[0], tokens, environ) == -1)
 		{
 			perror("execve");
-			exit(EXIT_FAILURE);
+			exit(127);
 		}
 	}
 	else
 		waitpid(pid, &status, 0);
-
-	return (WIFEXITED(status) ? WEXITSTATUS(status) : 0);
+	exitCode = WIFEXITED(status) ? WEXITSTATUS(status) : 0;
+	return (exitCode);
 }
+
+void get_path(char **pathname)
+{
+	char *token = NULL, *path = NULL, *fullpath = NULL, *dup_path;
+
+	if (!pathname || !(*pathname))
+		return;
+
+	path = getenv("PATH");
+	if (path == NULL)
+		return;
+
+	dup_path = strdup(path);
+	token = strtok(dup_path, ":");
+	while (token)
+	{
+		fullpath = malloc(sizeof(char) * (strlen(token) + 
+					strlen(*pathname) + 2));
+		sprintf(fullpath, "%s/%s", token, *pathname);
+
+		if (access(fullpath, X_OK) == 0)
+		{
+			free(*pathname);
+			*pathname = strdup(fullpath);
+			free(fullpath);
+			break;
+		}
+		free(fullpath);
+		token = strtok(NULL, ":");
+	}
+	free(dup_path);
+}
+	
+
