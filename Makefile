@@ -11,7 +11,7 @@ SRCS = shell.c
 OBJS = $(SRCS:.c=.o)
 
 #specify target file
-TARGET = tsh
+TARGET = hsh
 
 #Build rule for the target file
 $(TARGET): $(OBJS)
