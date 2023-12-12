@@ -5,7 +5,7 @@ CC = gcc
 CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89
 
 #list of source files
-SRCS = shell.c 
+SRCS = shell.c alias.c alias_handler.c alias_utils.c env.c
 
 #object files from srcs
 OBJS = $(SRCS:.c=.o)
