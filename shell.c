@@ -1,4 +1,4 @@
-#include "shell.h"
+#include "liteshell.h"
 
 
 char **tokenizer(char *line, const char *delim)
@@ -71,6 +71,8 @@ int main(__attribute__((unused))int argc, char **argv)
 	size_t n;
 	char *line = NULL, **tokens = NULL;
 	int lastExitCode = 0;
+	alias_t *aliasList = initAliasList(NULL);
+	alias_node *alias = NULL;
 
 	while (1)
 	{
@@ -85,15 +87,34 @@ int main(__attribute__((unused))int argc, char **argv)
 			free(line);
 			if (isatty(STDIN_FILENO))
 				printf("\n");
+			freeAliasList(aliasList);
 			exit(lastExitCode);
 		}
 		line[bytesR - 1] = '\0';		
 		tokens = tokenizer(line, " ");
 		if (!tokens)
 			continue;
-		if (strcmp(tokens[0], "exit") == 0)
-			exit(lastExitCode);
-		lastExitCode = executeCommand(tokens, argv, cmd_count);
+		if (strcmp(tokens[0], "alias") == 0)
+			handleAlias(aliasList, tokens + 1);
+		else
+		{
+			alias = findAlias(aliasList, tokens[0]);
+			if (alias)
+			{
+				free(tokens[0]);
+				tokens[0] = strdup(alias->value);
+			}
+			if (strcmp(tokens[0], "exit") == 0)
+			{
+				freeTokens(tokens);
+				free(line);
+				freeAliasList(aliasList);
+				exit(lastExitCode);
+			}
+			if (strcmp(tokens[0], "env") == 0)
+				printenv();
+			lastExitCode = executeCommand(tokens, argv, cmd_count);
+		}
 		freeTokens(tokens);
 	}
 	free(line);
