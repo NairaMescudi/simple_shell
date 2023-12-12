@@ -42,5 +42,6 @@ char **tokenizer(char *line, const char *delim);
 int executeCommand(char **tokens, char **argv, size_t cmd_count);
 extern char** environ;
 void get_path(char **pathname);
+void printenv(void);
 
 #endif
