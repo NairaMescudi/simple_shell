@@ -48,7 +48,7 @@ int handleAlias(alias_t *aliasList, char **arguments)
 	int i;
 
 	if (!arguments[0])
-		return (printAliasList(aliasList));
+		printAliasList(aliasList);
 	for (i = 0; arguments[i]; ++i)
 		handleAliasCommands(aliasList, arguments[i]);
 	return (0);
