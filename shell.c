@@ -41,26 +41,32 @@ char **tokenizer(char *line, const char *delim)
 	return (tokens);
 }
 
-void freeTokens(char **tokens)
+char *read_command(alias_t *list, int status)
 {
-	int i;
+	char *line = NULL;
+	size_t n;
+	ssize_t bytesR = 0;
 
-	if (!tokens)
-		return;
-        
-	for (i = 0; tokens[i]; i++)
+	bytesR = getline(&line, &n, stdin);
+
+	if (bytesR == -1) /* errors and EOF */
 	{
-                free(tokens[i]);
-		tokens[i] = NULL;
+		_free(line);
+
+		if (isatty(STDIN_FILENO))
+			printf("\n");
+		freeAliasList(list);
+		exit(status);
 	}
-        free(tokens);
-	tokens = NULL;
+	line[bytesR - 1] = '\0';
+
+	return (line);
 }
+
 
 int main(__attribute__((unused))int argc, char **argv)
 {
-	ssize_t bytesR = 0, cmd_count = 0;
-	size_t n;
+	ssize_t cmd_count = 0;
 	char *line = NULL, **tokens = NULL;
 	int lastExitCode = 0;
 	alias_t *aliasList = initAliasList(NULL);
@@ -68,21 +74,9 @@ int main(__attribute__((unused))int argc, char **argv)
 
 	while (1)
 	{
-		if (isatty(STDIN_FILENO))
-			printf("$ ");
-		fflush(stdout);
+		print_prompt();
 		++cmd_count;
-
-		bytesR = getline(&line, &n, stdin);
-		if (bytesR == -1) /* errors and EOF */
-		{
-			free(line);
-			if (isatty(STDIN_FILENO))
-				printf("\n");
-			freeAliasList(aliasList);
-			exit(lastExitCode);
-		}
-		line[bytesR - 1] = '\0';		
+		line = read_command(aliasList, lastExitCode);
 		tokens = tokenizer(line, " ");
 		if (!tokens)
 			continue;
@@ -97,24 +91,20 @@ int main(__attribute__((unused))int argc, char **argv)
 				tokens[0] = strdup(alias->value);
 			}
 			if (strcmp(tokens[0], "exit") == 0)
-			{
-				freeTokens(tokens);
-				free(line);
-				freeAliasList(aliasList);
-				exit(lastExitCode);
-			}
+				handle_exit(tokens, line, aliasList, lastExitCode);
 			if (strcmp(tokens[0], "env") == 0 || strcmp(tokens[0], "printenv") == 0)
 			{
+				_free(line);
 				exec_env();
 				freeTokens(tokens);
 				continue;
 			}
 			lastExitCode = executeCommand(tokens, argv, cmd_count);
 		}
+		_free(line);
 		freeTokens(tokens);
 	}
-	free(line);
-	line = NULL;
+	_free(line);
 	return (0);
 }
 
@@ -173,7 +163,7 @@ void get_path(char **pathname)
 	token = strtok(dup_path, ":");
 	while (token)
 	{
-		fullpath = malloc(sizeof(char) * (strlen(token) + 
+		fullpath = malloc(sizeof(char) * (strlen(token) +
 					strlen(*pathname) + 2));
 		sprintf(fullpath, "%s/%s", token, *pathname);
 

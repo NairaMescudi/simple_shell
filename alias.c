@@ -18,6 +18,7 @@ alias_t *initAliasList(alias_t *aliasList)
 int addAlias(alias_t *aliasList, const char *name, const char *value)
 {
 	alias_node *newAlias = (alias_node *)malloc(sizeof(alias_node));
+
 	if (newAlias == NULL)
 	{
 		dprintf(2, "Failed to malloc\n");
@@ -40,57 +41,50 @@ int addAlias(alias_t *aliasList, const char *name, const char *value)
 
 alias_node *findAlias(alias_t *aliasList, const char *name)
 {
-        alias_node *currAlias = aliasList->head;
-        while (currAlias)
-        {
-                if (strcmp(currAlias->name, name) == 0)
-                        return currAlias;
-                currAlias = currAlias->next;
-        }
-        return (NULL);
+	alias_node *currAlias = aliasList->head;
+
+	while (currAlias)
+	{
+		if (strcmp(currAlias->name, name) == 0)
+			return (currAlias);
+		currAlias = currAlias->next;
+	}
+	return (NULL);
 }
 
-/**alias_node *findLastAlias(alias_t *aliasList, const char *name)
-*{
-*    alias_node *currAlias = findAlias(aliasList, name);
-*
-*    while (currAlias && currAlias->value
-*		    && currAlias->value[0] == 'a'
-*		    && currAlias->value[1] == 'l'
-*		    && currAlias->value[2] == 'i'
-*		    && currAlias->value[3] == 'a'
-*		    && currAlias->value[4] == 's'
-*		    )
-*    {
-*        currAlias = findAlias(aliasList, currAlias->value + 5);
-*    }
-*
-*    return currAlias;
-*}
+/**
+ * alias_node *findLastAlias(alias_t *aliasList, const char *name)
+ * {
+ *    alias_node *currAlias = findAlias(aliasList, name);
+ *
+ *    while (currAlias && currAlias->value
+ *		    && currAlias->value[0] == 'a'
+ *		    && currAlias->value[1] == 'l'
+ *		    && currAlias->value[2] == 'i'
+ *		    && currAlias->value[3] == 'a'
+ *		    && currAlias->value[4] == 's'
+ *		    )
+ *    {
+ *        currAlias = findAlias(aliasList, currAlias->value + 5);
+ *    }
+ *
+ *    return currAlias;
+ * }
 */
 
-alias_node *findLastAlias(alias_t *aliasList, const char *name) {
-    alias_node *currAlias = aliasList->head;
-    alias_node *lastAlias = NULL;
-    while (currAlias) {
-        if (strcmp(currAlias->name, name) == 0) {
-            lastAlias = currAlias;
-        }
-        currAlias = currAlias->next;
-    }
-    return lastAlias;
-}
-
-
-int printAlias(alias_node *alias, const char *name)
+alias_node *findLastAlias(alias_t *aliasList, const char *name)
 {
-	if (!alias)
+	alias_node *currAlias = aliasList->head;
+	alias_node *lastAlias = NULL;
+
+	while (currAlias)
 	{
-		printf("alias: %s not found\n", name);
-		return (1);
+		if (strcmp(currAlias->name, name) == 0)
+			lastAlias = currAlias;
+
+		currAlias = currAlias->next;
 	}
-	printf("%s='%s'\n", alias->name, alias->value);
-	return (0);
+	return (lastAlias);
 }
 
 int removeAlias(alias_t *aliasList, const char *name)
