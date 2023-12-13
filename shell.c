@@ -102,7 +102,7 @@ int main(__attribute__((unused))int argc, char **argv)
 			}
 			if (strcmp(tokens[0], "env") == 0 || strcmp(tokens[0], "printenv") == 0)
 			{
-				exec_env();
+				handle_env();
 				freeTokens(tokens);
 				continue;
 			}
