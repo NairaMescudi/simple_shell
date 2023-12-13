@@ -57,14 +57,6 @@ void freeTokens(char **tokens)
 	tokens = NULL;
 }
 
-/**
-  * 1. Get commands and tokenize 
-  * 2. Fork a new process based on command
-  * 3. Wait the parent process
-  * 4. Pass the tokenized input into the execve call
-  * 5. Execute the commands
-  * 6. Repeat
-  */
 int main(__attribute__((unused))int argc, char **argv)
 {
 	ssize_t bytesR = 0, cmd_count = 0;
@@ -111,8 +103,12 @@ int main(__attribute__((unused))int argc, char **argv)
 				freeAliasList(aliasList);
 				exit(lastExitCode);
 			}
-			if (strcmp(tokens[0], "env") == 0)
-				printenv();
+			if (strcmp(tokens[0], "env") == 0 || strcmp(tokens[0], "printenv") == 0)
+			{
+				exec_env();
+				freeTokens(tokens);
+				continue;
+			}
 			lastExitCode = executeCommand(tokens, argv, cmd_count);
 		}
 		freeTokens(tokens);
@@ -191,7 +187,4 @@ void get_path(char **pathname)
 		free(fullpath);
 		token = strtok(NULL, ":");
 	}
-	free(dup_path);
 }
-	
-

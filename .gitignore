@@ -5,3 +5,9 @@ runchecker.bash
 prev
 utils
 shell
+shell.o
+env.o
+alias_handler.o
+alias.o
+alias_utils.o
+hsh

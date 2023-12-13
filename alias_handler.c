@@ -56,27 +56,53 @@ int handleAlias(alias_t *aliasList, char **arguments)
 
 int handleAliasCommands(alias_t *aliasList, char *argument)
 {
-	char **aliasTokens = tokenizeAliasArguments(argument);
-	char *name = aliasTokens[0], *value = aliasTokens[1];
-	alias_node *alias;
+    char **aliasTokens = tokenizeAliasArguments(argument);
+    char *name = aliasTokens[0], *value = aliasTokens[1];
+    alias_node *alias, *lastAlias;
 
-	if (value == NULL)
-	{
-		alias = findAlias(aliasList, name);
-		printAlias(alias, name);
-	}
-	else
-	{
-		alias = findAlias(aliasList, name);
-		if (alias == NULL)
-			addAlias(aliasList, name, value);
-		else
-		{
-			free(alias->value);
-			alias->value = strdup(value);
-		}
-	}
-	freeTokens(aliasTokens);
-	aliasTokens = NULL;
-	return (0);
+    if (value == NULL)
+    {
+        lastAlias = findLastAlias(aliasList, name);
+        printAlias(lastAlias, name);
+    }
+    else
+    {
+        alias = findAlias(aliasList, name);
+        if (alias == NULL)
+            addAlias(aliasList, name, value);
+        else
+        {
+            char *chainedValue = malloc(strlen(name) + strlen("=") + strlen(value) + 1);
+            sprintf(chainedValue, "%s=%s", name, value);
+            free(alias->value);
+            alias->value = chainedValue;
+        }
+    }
+
+    freeTokens(aliasTokens);
+    aliasTokens = NULL;
+    return 0;
 }
+/**int handleAliasCommands(alias_t *aliasList, char *argument)
+*{
+*	char **aliasTokens = tokenizeAliasArguments(argument);
+*	char *name = aliasTokens[0], *value = aliasTokens[1];
+*	alias_node *alias;
+*
+*	alias = findLastAlias(aliasList, name);
+*	if (value == NULL)
+*		printAlias(alias, name);
+*	else
+*	{
+*		if (alias == NULL)
+*			addAlias(aliasList, name, value);
+*		else
+*		{
+*			free(alias->value);
+*			alias->value = strdup(value);
+*		}
+*	}
+*	freeTokens(aliasTokens);
+*	aliasTokens = NULL;
+*	return (0);
+}*/

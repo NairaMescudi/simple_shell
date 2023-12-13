@@ -34,6 +34,7 @@ void freeAlias(alias_node *node);
 void freeAliasList(alias_t *aliasList);
 void freeTokens(char **tokens);
 char **tokenize(const char *input_str, const char *delim);
+char **tokenizeAliasArguments(char *argument);
 int printAliasList(alias_t *aliasList);
 int printAlias(alias_node *, const char *);
 int handleAlias(alias_t *aliasList, char **arguments);
@@ -42,6 +43,9 @@ char **tokenizer(char *line, const char *delim);
 int executeCommand(char **tokens, char **argv, size_t cmd_count);
 extern char** environ;
 void get_path(char **pathname);
-void printenv(void);
+void exec_env(void);
+int executeOriginalShell(char **tokens, char **argv);
+alias_node *findLastAlias(alias_t *aliasList, const char *name);
+
 
 #endif
