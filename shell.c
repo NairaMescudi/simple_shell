@@ -1,6 +1,5 @@
 #include "shell.h"
 
-
 char **tokenizer(char *line, const char *delim)
 {
 	char *dup_line = NULL, *token = NULL, **tokens = NULL;
@@ -88,6 +87,10 @@ int main(__attribute__((unused))int argc, char **argv)
 			continue;
 		if (strcmp(tokens[0], "alias") == 0)
 			handleAlias(aliasList, tokens + 1);
+		else if (strcmp(tokens[0], "setenv") == 0)
+			handle_setenv(tokens);
+		else if (strcmp(tokens[0], "unsetenv") == 0)
+			handle_unsetenv(tokens);
 		else
 		{
 			alias = findAlias(aliasList, tokens[0]);

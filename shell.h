@@ -44,8 +44,9 @@ int executeCommand(char **tokens, char **argv, size_t cmd_count);
 extern char** environ;
 void get_path(char **pathname);
 void exec_env(void);
+void handle_setenv(char **tokens);
+void handle_unsetenv(char **tokens);
 int executeOriginalShell(char **tokens, char **argv);
 alias_node *findLastAlias(alias_t *aliasList, const char *name);
-
 
 #endif

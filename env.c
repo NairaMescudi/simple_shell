@@ -1,33 +1,4 @@
 #include "shell.h"
-/**void printenv(void)
-*{
-*   pid_t pid;
-*    int status;
-*
-*    pid = fork();
-*
-*    if (pid == -1)
-*    {
-*        perror("fork");
-*        exit(EXIT_FAILURE);
-*    }
-*
-*    if (pid == 0)
-*    {
-*        char *const env_cmd[] = {"/usr/bin/env", NULL};
-*        if (execve("/usr/bin/env", env_cmd, NULL) == -1)
-*        {
-*            perror("execve");
-*            exit(EXIT_FAILURE);
-*        }
-*    }
-*    else
-*    {
-*        waitpid(pid, &status, 0);
-*    }
-*}
-*/
-
 void exec_env() {
 	char *command[] = {"sh", "-c", "env", NULL};
 	char **env = environ;
@@ -51,14 +22,31 @@ void exec_env() {
 		waitpid(pid, NULL, 0);
 	}
 }
-/**
-*{
-*        int i = 0;
-*
-*        while (environ[i] != NULL)
-*        {
-*                printf("%s\n", environ[i]);
-*                ++i;
-*        }
-*}
-*/
+
+void handle_setenv(char **tokens)
+{
+    if (tokens[1] == NULL || tokens[2] == NULL || tokens[3] != NULL)
+    {
+        fprintf(stderr, "Usage: setenv VARIABLE VALUE\n");
+        return;
+    }
+
+    if (setenv(tokens[1], tokens[2], 1) != 0)
+    {
+        perror("setenv");
+    }
+}
+
+void handle_unsetenv(char **tokens)
+{
+    if (tokens[1] == NULL || tokens[2] != NULL)
+    {
+        fprintf(stderr, "Usage: unsetenv VARIABLE\n");
+        return;
+    }
+
+    if (unsetenv(tokens[1]) != 0)
+    {
+        perror("unsetenv");
+    }
+}
