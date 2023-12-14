@@ -25,7 +25,6 @@ typedef struct alias_t
 	alias_node *tail;
 	size_t size;
 } alias_t;
-	
 alias_t *initAliasList();
 int addAlias(alias_t *aliasList, const char *name, const char *value);
 alias_node *findAlias(alias_t *aliasList, const char *name);
@@ -41,11 +40,14 @@ int handleAlias(alias_t *aliasList, char **arguments);
 int handleAliasCommands(alias_t *aliasList, char *argument);
 char **tokenizer(char *line, const char *delim);
 int executeCommand(char **tokens, char **argv, size_t cmd_count);
-extern char** environ;
+extern char **environ;
 void get_path(char **pathname);
 void exec_env(void);
 int executeOriginalShell(char **tokens, char **argv);
 alias_node *findLastAlias(alias_t *aliasList, const char *name);
-
+char *read_command(alias_t *list, int status);
+void _free(char *ptr);
+void handle_exit(char **arr, char *ptr, alias_t *list, int status);
+void print_prompt(void);
 
 #endif
