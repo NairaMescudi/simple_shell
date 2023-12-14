@@ -12,11 +12,8 @@ char **tokenizer(char *line, const char *delim)
 	char *dup_line = NULL, *token = NULL, **tokens = NULL;
 	size_t i, tok_count = 0;
 
-	/* check if line is NULL */
 	if (!line || !(*line))
 		return (NULL);
-
-	/* duplicate line for counting tokens */
 	dup_line = strdup(line);
 	token = strtok(dup_line, delim);
 	while (token)
@@ -25,7 +22,6 @@ char **tokenizer(char *line, const char *delim)
 		token = strtok(NULL, delim);
 	}
 	free(dup_line);
-	/* allocate enough mem for tokens array */
 	if (tok_count > 0)
 	{
 		tokens = malloc(sizeof(char *) * (tok_count + 1));
@@ -35,7 +31,6 @@ char **tokenizer(char *line, const char *delim)
 			exit(EXIT_FAILURE);
 		}
 		tokens[tok_count] = NULL;
-		/* store tokens in alloced array */
 		token = strtok(line, delim);
 		for (i = 0; token; i++)
 		{
@@ -77,6 +72,15 @@ char *read_command(alias_t *list, int status)
 	line[bytesR - 1] = '\0';
 
 	return (line);
+	if (!tokens)
+		return;
+	for (i = 0; tokens[i]; i++)
+	{
+		free(tokens[i]);
+		tokens[i] = NULL;
+	}
+	free(tokens);
+	tokens = NULL;
 }
 
 /**
@@ -99,11 +103,26 @@ int main(__attribute__((unused))int argc, char **argv)
 		print_prompt();
 		++cmd_count;
 		line = read_command(aliasList, lastExitCode);
+
+		bytesR = getline(&line, &n, stdin);
+		if (bytesR == -1) /* errors and EOF */
+		{
+			free(line);
+			if (isatty(STDIN_FILENO))
+				printf("\n");
+			freeAliasList(aliasList);
+			exit(lastExitCode);
+		}
+		line[bytesR - 1] = '\0';
 		tokens = tokenizer(line, " ");
 		if (!tokens)
 			continue;
 		if (strcmp(tokens[0], "alias") == 0)
 			handleAlias(aliasList, tokens + 1);
+		else if (strcmp(tokens[0], "setenv") == 0)
+			handle_setenv(tokens);
+		else if (strcmp(tokens[0], "unsetenv") == 0)
+			handle_unsetenv(tokens);
 		else
 		{
 			alias = findAlias(aliasList, tokens[0]);
@@ -118,6 +137,7 @@ int main(__attribute__((unused))int argc, char **argv)
 			{
 				_free(line);
 				exec_env();
+				handle_env();
 				freeTokens(tokens);
 				continue;
 			}
@@ -156,7 +176,6 @@ int executeCommand(char **tokens, char **argv, size_t cmd_count)
 			return (127);
 		}
 	}
-
 	pid = fork();
 	if (pid == -1)
 	{
@@ -201,6 +220,8 @@ void get_path(char **pathname)
 	{
 		fullpath = malloc(sizeof(char) * (strlen(token) +
 					strlen(*pathname) + 2));
+		fullpath = malloc(sizeof(char) * (strlen(token)
+					+ strlen(*pathname) + 2));
 		sprintf(fullpath, "%s/%s", token, *pathname);
 
 		if (access(fullpath, X_OK) == 0)

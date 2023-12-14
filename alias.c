@@ -24,7 +24,6 @@ int addAlias(alias_t *aliasList, const char *name, const char *value)
 		dprintf(2, "Failed to malloc\n");
 		return (1);
 	}
-
 	newAlias->name = strdup(name);
 	newAlias->value = strdup(value);
 	newAlias->next = NULL;
@@ -50,6 +49,29 @@ alias_node *findAlias(alias_t *aliasList, const char *name)
 		currAlias = currAlias->next;
 	}
 	return (NULL);
+
+	while (currAlias)
+	{
+		if (strcmp(currAlias->name, name) == 0)
+			return (currAlias);
+		currAlias = currAlias->next;
+	}
+	return (NULL);
+}
+
+
+alias_node *findLastAlias(alias_t *aliasList, const char *name)
+{
+	alias_node *currAlias = aliasList->head;
+	alias_node *lastAlias = NULL;
+
+	while (currAlias)
+	{
+		if (strcmp(currAlias->name, name) == 0)
+			lastAlias = currAlias;
+		currAlias = currAlias->next;
+	}
+	return (lastAlias);
 }
 
 /**

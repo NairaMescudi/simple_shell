@@ -20,7 +20,6 @@ char **tokenizeAliasArguments(char *argument)
 		tokens[0] = (char *)malloc(len_name + 1);
 		if (!tokens[0])
 			exit(EXIT_FAILURE);
-
 		strncpy(tokens[0], argument, len_name);
 		tokens[0][len_name] = '\0';
 		len_value = strlen(equalToSign + 1);
@@ -75,6 +74,25 @@ int handleAliasCommands(alias_t *aliasList, char *argument)
 		{
 			char *chainedValue = malloc(strlen(name) + strlen("=") + strlen(value) + 1);
 
+	char *chainedValue = NULL;
+	alias_node *alias = NULL, *lastAlias = NULL;
+
+	if (value == NULL)
+	{
+		lastAlias = findLastAlias(aliasList, name);
+		printAlias(lastAlias, name);
+	}
+	else
+	{
+		alias = findAlias(aliasList, name);
+		if (alias == NULL)
+			addAlias(aliasList, name, value);
+		else
+		{
+			chainedValue = malloc(strlen(name)
+					+ strlen("=")
+					+ strlen(value)
+					+ 1);
 			sprintf(chainedValue, "%s=%s", name, value);
 			free(alias->value);
 			alias->value = chainedValue;
@@ -111,3 +129,5 @@ int handleAliasCommands(alias_t *aliasList, char *argument)
  *	return (0);
  *  }
 */
+	return (0);
+}

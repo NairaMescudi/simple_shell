@@ -1,18 +1,16 @@
 #include "shell.h"
 
 void exec_env(void)
+void handle_env(void)
 {
 	char *command[] = {"sh", "-c", "env", NULL};
 	char **env = environ;
-
-	/* Create a child process */
 	pid_t pid = fork();
 
 	if (pid == 0)
 	{
 		/* This is the child process */
 		execve("/bin/sh", command, env);
-		/* execve only returns if an error occurs */
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
@@ -27,5 +25,26 @@ void exec_env(void)
 		/* This is the parent process */
 		/* Wait for the child to complete */
 		waitpid(pid, NULL, 0);
+}
+
+void handle_setenv(char **tokens)
+{
+	if (!tokens[1] || !tokens[2] || tokens[3])
+	{
+		fprintf(stderr, "Usage: setenv VARIABLE VALUE\n");
+		return;
 	}
+	if (setenv(tokens[1], tokens[2], 1))
+		perror("setenv");
+}
+
+void handle_unsetenv(char **tokens)
+{
+	if (!tokens[1] || tokens[2])
+	{
+		fprintf(stderr, "Usage: unsetenv VARIABLE\n");
+		return;
+	}
+	if (unsetenv(tokens[1]))
+		perror("unsetenv");
 }
