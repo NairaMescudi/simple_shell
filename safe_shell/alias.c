@@ -49,50 +49,8 @@ alias_node *findAlias(alias_t *aliasList, const char *name)
 		currAlias = currAlias->next;
 	}
 	return (NULL);
-
-	while (currAlias)
-	{
-		if (strcmp(currAlias->name, name) == 0)
-			return (currAlias);
-		currAlias = currAlias->next;
-	}
-	return (NULL);
 }
 
-
-/**alias_node *findLastAlias(alias_t *aliasList, const char *name)
-*{
-*	alias_node *currAlias = aliasList->head;
-*	alias_node *lastAlias = NULL;
-*
-*	while (currAlias)
-*	{
-*		if (strcmp(currAlias->name, name) == 0)
-*			lastAlias = currAlias;
-*		currAlias = currAlias->next;
-*	}
-*	return (lastAlias);
-}*/
-
-/**
- * alias_node *findLastAlias(alias_t *aliasList, const char *name)
- * {
- *    alias_node *currAlias = findAlias(aliasList, name);
- *
- *    while (currAlias && currAlias->value
- *		    && currAlias->value[0] == 'a'
- *		    && currAlias->value[1] == 'l'
- *		    && currAlias->value[2] == 'i'
- *		    && currAlias->value[3] == 'a'
- *		    && currAlias->value[4] == 's'
- *		    )
- *    {
- *        currAlias = findAlias(aliasList, currAlias->value + 5);
- *    }
- *
- *    return currAlias;
- * }
-*/
 
 alias_node *findLastAlias(alias_t *aliasList, const char *name)
 {
@@ -103,10 +61,21 @@ alias_node *findLastAlias(alias_t *aliasList, const char *name)
 	{
 		if (strcmp(currAlias->name, name) == 0)
 			lastAlias = currAlias;
-
 		currAlias = currAlias->next;
 	}
 	return (lastAlias);
+}
+
+
+int printAlias(alias_node *alias, const char *name)
+{
+	if (!alias)
+	{
+		printf("alias: %s not found\n", name);
+		return (1);
+	}
+	printf("%s='%s'\n", alias->name, alias->value);
+	return (0);
 }
 
 int removeAlias(alias_t *aliasList, const char *name)

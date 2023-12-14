@@ -83,32 +83,5 @@ int handleAliasCommands(alias_t *aliasList, char *argument)
 	}
 	freeTokens(aliasTokens);
 	aliasTokens = NULL;
-
 	return (0);
 }
-
-/**
- * int handleAliasCommands(alias_t *aliasList, char *argument)
- * {
- *	char **aliasTokens = tokenizeAliasArguments(argument);
- *	char *name = aliasTokens[0], *value = aliasTokens[1];
- *	alias_node *alias;
- *
- *	alias = findLastAlias(aliasList, name);
- *	if (value == NULL)
- *		printAlias(alias, name);
- *	else
- *	{
- *		if (alias == NULL)
- *			addAlias(aliasList, name, value);
- *		else
- *		{
- *			free(alias->value);
- *			alias->value = strdup(value);
- *		}
- *	}
- *	freeTokens(aliasTokens);
- *	aliasTokens = NULL;
- *	return (0);
- *  }
-*/
