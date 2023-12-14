@@ -1,12 +1,5 @@
 #include "shell.h"
 
-/**
- * tokenizer - make tokens from string
- * @line: string to tokenise
- * @delim: string delimiter
- *
- * Return: an array of tokens
-*/
 char **tokenizer(char *line, const char *delim)
 {
 	char *dup_line = NULL, *token = NULL, **tokens = NULL;
@@ -18,7 +11,8 @@ char **tokenizer(char *line, const char *delim)
 	token = strtok(dup_line, delim);
 	while (token)
 	{
-		++tok_count;
+		if (token[0] != '#' && token[0] != '\0')
+			++tok_count;
 		token = strtok(NULL, delim);
 	}
 	free(dup_line);
@@ -32,9 +26,10 @@ char **tokenizer(char *line, const char *delim)
 		}
 		tokens[tok_count] = NULL;
 		token = strtok(line, delim);
-		for (i = 0; token; i++)
+		for (i = 0; token;)
 		{
-			tokens[i] = strdup(token);
+			if (token[0] != '#' && token[0] != '\0')
+				tokens[i++] = strdup(token);
 			token = strtok(NULL, delim);
 		}
 	}
@@ -42,57 +37,25 @@ char **tokenizer(char *line, const char *delim)
 	return (tokens);
 }
 
-/**
- * read_command - read user input
- * @list: list of aliases
- * @status: command return value
- *
- * Description: read users input from stdout
- * using getline()
- *
- * Return: user input (string)
-*/
-char *read_command(alias_t *list, int status)
+void freeTokens(char **tokens)
 {
-	char *line = NULL;
-	size_t n;
-	ssize_t bytesR = 0;
+	int i;
 
-	bytesR = getline(&line, &n, stdin);
-
-	if (bytesR == -1) /* errors and EOF */
+	if (!tokens)
+		return;
+	for (i = 0; tokens[i]; i++)
 	{
-		_free(line);
-
-		if (isatty(STDIN_FILENO))
-			printf("\n");
-		freeAliasList(list);
-		exit(status);
+		free(tokens[i]);
+		tokens[i] = NULL;
 	}
-	line[bytesR - 1] = '\0';
+	free(tokens);
+	tokens = NULL;
+}
 
-	return (line);
-/**	if (!tokens)
-*		return;
-*	for (i = 0; tokens[i]; i++)
-*	{
-*		free(tokens[i]);
-*		tokens[i] = NULL;
-*	}
-*	free(tokens);
-*	tokens = NULL;
-*/}
-
-/**
- * main - run a shell instance
- * @argc: argument count
- * @argv: argument vector
- *
- * Return: dependent on syscalls status
-*/
 int main(__attribute__((unused))int argc, char **argv)
 {
-	ssize_t cmd_count = 0;
+	ssize_t bytesR = 0, cmd_count = 0;
+	size_t n;
 	char *line = NULL, **tokens = NULL;
 	int lastExitCode = 0;
 	alias_t *aliasList = initAliasList(NULL);
@@ -100,23 +63,29 @@ int main(__attribute__((unused))int argc, char **argv)
 
 	while (1)
 	{
-		print_prompt();
+		if (isatty(STDIN_FILENO))
+			printf("$ ");
+		fflush(stdout);
 		++cmd_count;
-		line = read_command(aliasList, lastExitCode);
 
-/**		bytesR = getline(&line, &n, stdin);
-*		if (bytesR == -1) 
-*		{
-*			free(line);
-*			if (isatty(STDIN_FILENO))
-*				printf("\n");
-*			freeAliasList(aliasList);
-*			exit(lastExitCode);
-*		}
-*		line[bytesR - 1] = '\0';
-*/		tokens = tokenizer(line, " ");
+		bytesR = getline(&line, &n, stdin);
+		if (bytesR == -1) /* errors and EOF */
+		{
+			free(line);
+			if (isatty(STDIN_FILENO))
+				printf("\n");
+			freeAliasList(aliasList);
+			exit(lastExitCode);
+		}
+		line[bytesR - 1] = '\0';
+		tokens = tokenizer(line, " ");
 		if (!tokens)
 			continue;
+		if (tokens[0][0] == '#' && tokens[0][1] == '\0')
+		{
+			freeTokens(tokens);
+			continue;
+		}
 		if (strcmp(tokens[0], "alias") == 0)
 			handleAlias(aliasList, tokens + 1);
 		else if (strcmp(tokens[0], "setenv") == 0)
@@ -132,31 +101,27 @@ int main(__attribute__((unused))int argc, char **argv)
 				tokens[0] = strdup(alias->value);
 			}
 			if (strcmp(tokens[0], "exit") == 0)
-				handle_exit(tokens, line, aliasList, lastExitCode);
+			{
+				freeTokens(tokens);
+				free(line);
+				freeAliasList(aliasList);
+				exit(lastExitCode);
+			}
 			if (strcmp(tokens[0], "env") == 0 || strcmp(tokens[0], "printenv") == 0)
 			{
-				_free(line);
 				handle_env();
 				freeTokens(tokens);
 				continue;
 			}
 			lastExitCode = executeCommand(tokens, argv, cmd_count);
 		}
-		_free(line);
 		freeTokens(tokens);
 	}
-	_free(line);
+	free(line);
+	line = NULL;
 	return (0);
 }
 
-/**
- * executeCommand - execute command
- * @tokens: an array of tokens
- * @argv: argument vector
- * @cmd_count: command count for each session
- *
- * Return: command status
-*/
 int executeCommand(char **tokens, char **argv, size_t cmd_count)
 {
 	pid_t pid;
@@ -196,12 +161,6 @@ int executeCommand(char **tokens, char **argv, size_t cmd_count)
 	return (exitCode);
 }
 
-/**
- * get_path - get command path
- * @pathname: command to execute
- *
- * Return: nothing
-*/
 void get_path(char **pathname)
 {
 	char *token = NULL, *path = NULL, *fullpath = NULL, *dup_path;
@@ -217,8 +176,6 @@ void get_path(char **pathname)
 	token = strtok(dup_path, ":");
 	while (token)
 	{
-		fullpath = malloc(sizeof(char) * (strlen(token) +
-					strlen(*pathname) + 2));
 		fullpath = malloc(sizeof(char) * (strlen(token)
 					+ strlen(*pathname) + 2));
 		sprintf(fullpath, "%s/%s", token, *pathname);
@@ -233,6 +190,4 @@ void get_path(char **pathname)
 		free(fullpath);
 		token = strtok(NULL, ":");
 	}
-	free(dup_path);
-	dup_path = NULL;
 }

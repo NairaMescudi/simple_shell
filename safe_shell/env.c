@@ -1,5 +1,4 @@
 #include "shell.h"
-
 void handle_env(void)
 {
 	char *command[] = {"sh", "-c", "env", NULL};
