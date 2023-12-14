@@ -1,4 +1,6 @@
 #include "shell.h"
+
+void exec_env(void)
 void handle_env(void)
 {
 	char *command[] = {"sh", "-c", "env", NULL};
@@ -7,16 +9,21 @@ void handle_env(void)
 
 	if (pid == 0)
 	{
+		/* This is the child process */
 		execve("/bin/sh", command, env);
 		perror("execve");
 		exit(EXIT_FAILURE);
 	}
 	else if (pid < 0)
 	{
+		/* Fork failed */
 		perror("fork");
 		exit(EXIT_FAILURE);
 	}
 	else
+	{
+		/* This is the parent process */
+		/* Wait for the child to complete */
 		waitpid(pid, NULL, 0);
 }
 

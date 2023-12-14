@@ -12,6 +12,17 @@ int printAliasList(alias_t *aliasList)
 	return (0);
 }
 
+int printAlias(alias_node *alias, const char *name)
+{
+	if (!alias)
+	{
+		printf("alias: %s not found\n", name);
+		return (1);
+	}
+	printf("%s='%s'\n", alias->name, alias->value);
+	return (0);
+}
+
 void freeAlias(alias_node *node)
 {
 	if (node)
