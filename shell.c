@@ -1,50 +1,40 @@
 #include "shell.h"
 
+int main(__attribute__((unused))int argc, char **argv);
+
 /**
  * tokenizer - make tokens from string
  * @line: string to tokenise
  * @delim: string delimiter
  *
  * Return: an array of tokens
-*/
+ */
 char **tokenizer(char *line, const char *delim)
 {
-	char *dup_line = NULL, *token = NULL, **tokens = NULL;
-	size_t i, tok_count = 0;
 
-	/* check if line is NULL */
-	if (!line || !(*line))
-		return (NULL);
+	char *token = NULL;
+	int i = 0;
+	char **tokens = malloc(sizeof(char *) * 100);
 
-	/* duplicate line for counting tokens */
-	dup_line = strdup(line);
-	token = strtok(dup_line, delim);
+	while (i < 100)
+	{
+		tokens[i] = NULL;
+		i++;
+	}
+	i = 0;
+	token = strtok(line, delim);
 	while (token)
 	{
-		++tok_count;
+		tokens[i] = malloc(sizeof(char) * (strlen(token) + 1));
+		strcpy(tokens[i], token);
 		token = strtok(NULL, delim);
+		i++;
 	}
-	free(dup_line);
-	/* allocate enough mem for tokens array */
-	if (tok_count > 0)
-	{
-		tokens = malloc(sizeof(char *) * (tok_count + 1));
-		if (tokens == NULL)
-		{
-			fprintf(stderr, "malloc failed\n");
-			exit(EXIT_FAILURE);
-		}
-		tokens[tok_count] = NULL;
-		/* store tokens in alloced array */
-		token = strtok(line, delim);
-		for (i = 0; token; i++)
-		{
-			tokens[i] = strdup(token);
-			token = strtok(NULL, delim);
-		}
-	}
-	tok_count = 0;
-	return (tokens);
+	if (tokens[0] == NULL)
+		return (NULL);
+	else
+		return (tokens);
+	return (NULL);
 }
 
 /**
@@ -56,7 +46,7 @@ char **tokenizer(char *line, const char *delim)
  * using getline()
  *
  * Return: user input (string)
-*/
+ */
 char *read_command(alias_t *list, int status)
 {
 	char *line = NULL;
@@ -67,14 +57,11 @@ char *read_command(alias_t *list, int status)
 
 	if (bytesR == -1) /* errors and EOF */
 	{
-		_free(line);
-
-		if (isatty(STDIN_FILENO))
-			printf("\n");
+		free(line);
 		freeAliasList(list);
+
 		exit(status);
 	}
-	line[bytesR - 1] = '\0';
 
 	return (line);
 }
@@ -85,7 +72,7 @@ char *read_command(alias_t *list, int status)
  * @argv: argument vector
  *
  * Return: dependent on syscalls status
-*/
+ */
 int main(__attribute__((unused))int argc, char **argv)
 {
 	ssize_t cmd_count = 0;
@@ -99,29 +86,37 @@ int main(__attribute__((unused))int argc, char **argv)
 		print_prompt();
 		++cmd_count;
 		line = read_command(aliasList, lastExitCode);
-		tokens = tokenizer(line, " ");
+		tokens = tokenizer(line, " \n\t\r");
+
 		if (!tokens)
+		{
+			_free(line);
 			continue;
-		if (strcmp(tokens[0], "alias") == 0)
-			handleAlias(aliasList, tokens + 1);
+		}
 		else
 		{
-			alias = findAlias(aliasList, tokens[0]);
-			if (alias)
+			if (strcmp(tokens[0], "alias") == 0)
+				handleAlias(aliasList, tokens + 1);
+			else
 			{
-				free(tokens[0]);
-				tokens[0] = strdup(alias->value);
+				alias = findAlias(aliasList, tokens[0]);
+
+				if (alias)
+				{
+					free(tokens[0]);
+					tokens[0] = strdup(alias->value);
+				}
+				if (strcmp(tokens[0], "exit") == 0)
+					handle_exit(tokens, line, aliasList, lastExitCode);
+				if (strcmp(tokens[0], "env") == 0 || strcmp(tokens[0], "printenv") == 0)
+				{
+					_free(line);
+					exec_env();
+					freeTokens(tokens);
+					continue;
+				}
+				lastExitCode = executeCommand(tokens, argv, cmd_count);
 			}
-			if (strcmp(tokens[0], "exit") == 0)
-				handle_exit(tokens, line, aliasList, lastExitCode);
-			if (strcmp(tokens[0], "env") == 0 || strcmp(tokens[0], "printenv") == 0)
-			{
-				_free(line);
-				exec_env();
-				freeTokens(tokens);
-				continue;
-			}
-			lastExitCode = executeCommand(tokens, argv, cmd_count);
 		}
 		_free(line);
 		freeTokens(tokens);
@@ -137,7 +132,7 @@ int main(__attribute__((unused))int argc, char **argv)
  * @cmd_count: command count for each session
  *
  * Return: command status
-*/
+ */
 int executeCommand(char **tokens, char **argv, size_t cmd_count)
 {
 	pid_t pid;
@@ -183,7 +178,7 @@ int executeCommand(char **tokens, char **argv, size_t cmd_count)
  * @pathname: command to execute
  *
  * Return: nothing
-*/
+ */
 void get_path(char **pathname)
 {
 	char *token = NULL, *path = NULL, *fullpath = NULL, *dup_path;
