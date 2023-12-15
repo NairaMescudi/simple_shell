@@ -10,7 +10,12 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-/**Define the alias node structure*/
+/**
+ * struct alias_node - alias node structure
+ * @name: alias name
+ * @value: command
+ * @next: pointer to the next node
+*/
 typedef struct alias_node
 {
 	char *name;
@@ -18,14 +23,18 @@ typedef struct alias_node
 	struct alias_node *next;
 } alias_node;
 
-/**Define the alias list structure*/
+/**
+ * struct alias_t - alias list structure
+ * @head: pointer to the first node
+ * @tail: pointer to the last node
+ * @size: list size
+*/
 typedef struct alias_t
 {
 	alias_node *head;
 	alias_node *tail;
 	size_t size;
 } alias_t;
-	
 alias_t *initAliasList();
 int addAlias(alias_t *aliasList, const char *name, const char *value);
 alias_node *findAlias(alias_t *aliasList, const char *name);
@@ -41,7 +50,7 @@ int handleAlias(alias_t *aliasList, char **arguments);
 int handleAliasCommands(alias_t *aliasList, char *argument);
 char **tokenizer(char *line, const char *delim);
 int executeCommand(char **tokens, char **argv, size_t cmd_count);
-extern char** environ;
+extern char **environ;
 void get_path(char **pathname);
 void handle_env(void);
 void handle_setenv(char **tokens);

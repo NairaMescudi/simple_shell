@@ -1,5 +1,11 @@
 #include "shell.h"
 
+/**
+ * tokenizeAliasArguments - make alias tokens
+ * @argument: alias name-value pair
+ *
+ * Return: array of alias name and value
+*/
 char **tokenizeAliasArguments(char *argument)
 {
 	char **tokens = NULL, *equalToSign = NULL;
@@ -42,6 +48,13 @@ char **tokenizeAliasArguments(char *argument)
 	return (tokens);
 }
 
+/**
+ * handleAlias - handle aliases
+ * @aliasList: alias list
+ * @arguments: command arguments
+ *
+ * Return: 0
+*/
 int handleAlias(alias_t *aliasList, char **arguments)
 {
 	int i;
@@ -53,6 +66,13 @@ int handleAlias(alias_t *aliasList, char **arguments)
 	return (0);
 }
 
+/**
+ * handleAliasCommands - handle alias commands
+ * @aliasList: alias list
+ * @argument: command arguments
+ *
+ * Return: 0
+*/
 int handleAliasCommands(alias_t *aliasList, char *argument)
 {
 	char **aliasTokens = tokenizeAliasArguments(argument);
@@ -84,4 +104,25 @@ int handleAliasCommands(alias_t *aliasList, char *argument)
 	freeTokens(aliasTokens);
 	aliasTokens = NULL;
 	return (0);
+}
+
+/**
+ * initAliasList - make alias list
+ * @aliasList: alias list
+ *
+ * Return: a pointer to alias list
+*/
+alias_t *initAliasList(alias_t *aliasList)
+{
+	if (aliasList != NULL)
+		return (aliasList);
+
+	aliasList = (alias_t *)malloc(sizeof(alias_t));
+	if (aliasList == NULL)
+		return (NULL);
+
+	aliasList->head = NULL;
+	aliasList->tail = NULL;
+	aliasList->size = 0;
+	return (aliasList);
 }

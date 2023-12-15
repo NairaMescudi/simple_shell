@@ -1,4 +1,10 @@
 #include "shell.h"
+
+/**
+ * handle_env - print env variables
+ *
+ * Return: nothing
+*/
 void handle_env(void)
 {
 	char *command[] = {"sh", "-c", "env", NULL};
@@ -20,6 +26,12 @@ void handle_env(void)
 		waitpid(pid, NULL, 0);
 }
 
+/**
+ * handle_setenv - set env variables
+ * @tokens: array of string
+ *
+ * Return: nothing
+*/
 void handle_setenv(char **tokens)
 {
 	if (!tokens[1] || !tokens[2] || tokens[3])
@@ -31,6 +43,12 @@ void handle_setenv(char **tokens)
 		perror("setenv");
 }
 
+/**
+ * handle_unsetenv - set env variables
+ * @tokens: array of string
+ *
+ * Return: nothing
+*/
 void handle_unsetenv(char **tokens)
 {
 	if (!tokens[1] || tokens[2])

@@ -1,5 +1,14 @@
 #include "shell.h"
 
+int main(__attribute__((unused))int argc, char **argv);
+
+/**
+ * tokenizer - make tokens from string
+ * @line: string to tokenise
+ * @delim: string delimiter
+ *
+ * Return: an array of tokens
+ */
 char **tokenizer(char *line, const char *delim)
 {
 	char *dup_line = NULL, *token = NULL, **tokens = NULL;
@@ -35,6 +44,12 @@ char **tokenizer(char *line, const char *delim)
 	return (tokens);
 }
 
+/**
+ * freeTokens - free tokens array
+ * @tokens: tokens to free
+ *
+ * Return: nothing
+ */
 void freeTokens(char **tokens)
 {
 	int i;
@@ -50,6 +65,13 @@ void freeTokens(char **tokens)
 	tokens = NULL;
 }
 
+/**
+ * main - run a shell instance
+ * @argc: argument count
+ * @argv: argument vector
+ *
+ * Return: dependent on syscalls status
+ */
 int main(__attribute__((unused))int argc, char **argv)
 {
 	ssize_t bytesR = 0, cmd_count = 0;
@@ -115,6 +137,14 @@ int main(__attribute__((unused))int argc, char **argv)
 	return (0);
 }
 
+/**
+ * executeCommand - execute command
+ * @tokens: an array of tokens
+ * @argv: argument vector
+ * @cmd_count: command count for each session
+ *
+ * Return: command status
+ */
 int executeCommand(char **tokens, char **argv, size_t cmd_count)
 {
 	pid_t pid;
@@ -154,6 +184,12 @@ int executeCommand(char **tokens, char **argv, size_t cmd_count)
 	return (exitCode);
 }
 
+/**
+ * get_path - get command path
+ * @pathname: command to execute
+ *
+ * Return: nothing
+ */
 void get_path(char **pathname)
 {
 	char *token = NULL, *path = NULL, *fullpath = NULL, *dup_path;

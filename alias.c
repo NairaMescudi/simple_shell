@@ -1,20 +1,13 @@
 #include "shell.h"
 
-alias_t *initAliasList(alias_t *aliasList)
-{
-	if (aliasList != NULL)
-		return (aliasList);
-
-	aliasList = (alias_t *)malloc(sizeof(alias_t));
-	if (aliasList == NULL)
-		return (NULL);
-
-	aliasList->head = NULL;
-	aliasList->tail = NULL;
-	aliasList->size = 0;
-	return (aliasList);
-}
-
+/**
+ * addAlias - add alias to list
+ * @aliasList: alias list
+ * @name: alias name
+ * @value: command
+ *
+ * Return: 0
+*/
 int addAlias(alias_t *aliasList, const char *name, const char *value)
 {
 	alias_node *newAlias = (alias_node *)malloc(sizeof(alias_node));
@@ -38,6 +31,13 @@ int addAlias(alias_t *aliasList, const char *name, const char *value)
 	return (0);
 }
 
+/**
+ * findAlias - search alias from list
+ * @aliasList: alias list
+ * @name: alias name
+ *
+ * Return: pointer to alias
+*/
 alias_node *findAlias(alias_t *aliasList, const char *name)
 {
 	alias_node *currAlias = aliasList->head;
@@ -51,7 +51,13 @@ alias_node *findAlias(alias_t *aliasList, const char *name)
 	return (NULL);
 }
 
-
+/**
+ * findLastAlias - get the last alias
+ * @aliasList: alias list
+ * @name: alias name
+ *
+ * Return: pointer to last alias
+*/
 alias_node *findLastAlias(alias_t *aliasList, const char *name)
 {
 	alias_node *currAlias = aliasList->head;
@@ -67,6 +73,13 @@ alias_node *findLastAlias(alias_t *aliasList, const char *name)
 }
 
 
+/**
+ * printAlias -  expand alias
+ * @alias: alias to expand
+ * @name: alias name
+ *
+ * Return: 0
+*/
 int printAlias(alias_node *alias, const char *name)
 {
 	if (!alias)
@@ -78,6 +91,13 @@ int printAlias(alias_node *alias, const char *name)
 	return (0);
 }
 
+/**
+ * removeAlias - remove alias from list
+ * @aliasList: alias list
+ * @name: alias name
+ *
+ * Return: 0
+*/
 int removeAlias(alias_t *aliasList, const char *name)
 {
 	alias_node *currAlias = aliasList->head, *prevAlias = NULL;
