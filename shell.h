@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <ctype.h>
 #include <fcntl.h>
 #include <stddef.h>
 #include <sys/wait.h>
@@ -49,7 +50,7 @@ int printAlias(alias_node *, const char *);
 int handleAlias(alias_t *aliasList, char **arguments);
 int handleAliasCommands(alias_t *aliasList, char *argument);
 char **tokenizer(char *line, const char *delim);
-int executeCommand(char **tokens, char **argv, size_t cmd_count);
+int executeCommands(char **tokens, char **argv, size_t cmd_count);
 extern char **environ;
 void get_path(char **pathname);
 void handle_env(void);
