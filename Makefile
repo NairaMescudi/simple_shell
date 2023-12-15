@@ -2,7 +2,7 @@
 CC = gcc
 
 #compiler flags
-CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89
+CFLAGS = -Wall -Werror -Wextra -pedantic -std=gnu89 -g
 
 #list of source files
 SRCS = shell.c alias.c alias_handler.c alias_utils.c env.c
