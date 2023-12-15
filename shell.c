@@ -154,7 +154,7 @@ int main(__attribute__((unused))int argc, char **argv)
 }
 
 /**
- * executeCommand - execute command
+ * executeCommands - execute command
  * @tokens: an array of tokens
  * @argv: argument vector
  * @cmd_count: command count for each session
