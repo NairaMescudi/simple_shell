@@ -117,6 +117,22 @@ int main(__attribute__((unused))int argc, char **argv)
 			}
 			if (strcmp(tokens[0], "exit") == 0)
 			{
+				if (tokens[1])
+				{
+					if (isdigit(*tokens[1]) &&
+							atoi(tokens[1]))
+						lastExitCode = atoi(tokens[1]);
+					else
+					{
+						fprintf(stderr,
+						"%s: %ld: %s: Illegal number: %s\n",
+						argv[0],
+						cmd_count,
+						tokens[0],
+						tokens[1]);
+						lastExitCode = 2;
+					}
+				}
 				freeTokens(tokens);
 				free(line);
 				freeAliasList(aliasList);
@@ -128,7 +144,7 @@ int main(__attribute__((unused))int argc, char **argv)
 				freeTokens(tokens);
 				continue;
 			}
-			lastExitCode = executeCommand(tokens, argv, cmd_count);
+			lastExitCode = executeCommands(tokens, argv, cmd_count);
 		}
 		freeTokens(tokens);
 	}
@@ -145,7 +161,7 @@ int main(__attribute__((unused))int argc, char **argv)
  *
  * Return: command status
  */
-int executeCommand(char **tokens, char **argv, size_t cmd_count)
+int executeCommands(char **tokens, char **argv, size_t cmd_count)
 {
 	pid_t pid;
 	int status, exitCode;
