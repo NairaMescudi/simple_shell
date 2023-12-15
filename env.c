@@ -34,13 +34,24 @@ void handle_env(void)
 */
 void handle_setenv(char **tokens)
 {
+	char *currentEnv = NULL;
+
 	if (!tokens[1] || !tokens[2] || tokens[3])
 	{
 		fprintf(stderr, "Usage: setenv VARIABLE VALUE\n");
 		return;
 	}
-	if (setenv(tokens[1], tokens[2], 1))
-		perror("setenv");
+	currentEnv = getenv(tokens[1]);
+	if (currentEnv == NULL)
+	{
+		if (setenv(tokens[1], tokens[2], 1))
+			perror("setenv");
+	}
+	else
+	{
+		unsetenv(tokens[1]);
+		setenv(tokens[1], tokens[2], 1);
+	}
 }
 
 /**
