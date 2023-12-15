@@ -219,4 +219,5 @@ void get_path(char **pathname)
 		free(fullpath);
 		token = strtok(NULL, ":");
 	}
+	free(dup_path);
 }
