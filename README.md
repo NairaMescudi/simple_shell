@@ -6,10 +6,15 @@ This user guide will walk you through the usage of the MinimalShell software, pr
 how to navigate and leverage its features.
 
 ## Requirements:
-* Operating System
-
+* Operating System: ``Simple Shell`` is designed for Unix-like operating systems.
+* Compiler: Ensure you have a C compiler installed (e.g., GCC).
 
 ## Getting Started:
+### Clone The Repository:
+```bash
+git clone https://github.com/NairaMescudi/simple_shell.git 
+cd simple_shell
+```
 The goal of this project is to create a basic shell that can handle essential
 commands, execute processes, and manage simple functionalities like input/output
 redirection as a team of software engineers.
