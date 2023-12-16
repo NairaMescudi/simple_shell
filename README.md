@@ -10,13 +10,25 @@ how to navigate and leverage its features.
 * Compiler: Ensure you have a C compiler installed (e.g., GCC).
 
 ## Getting Started:
-### Clone The Repository:
+* Clone The Repository:
 ```bash
-git clone https://github.com/NairaMescudi/simple_shell.git 
+git clone https://github.com/NairaMescudi/simple_shell.git
+```
+
+* Change Working Directory:
+Navigate into the directory that has just been cloned
+```bash
 cd simple_shell
 ```
-The goal of this project is to create a basic shell that can handle essential
-commands, execute processes, and manage simple functionalities like input/output
-redirection as a team of software engineers.
-As you progress, you'll gain insights into process creation, signal handling, and user interaction with the command line.
 
+* Build The Project:
+The project includes a Makefile for easy compilation.
+```bash
+make
+```
+
+* Run Simple Shell:
+Once built, execute the Simple Shell.
+```bash
+./hsh
+```
