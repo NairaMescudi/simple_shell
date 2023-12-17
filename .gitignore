@@ -1,5 +1,5 @@
 SIMPLE_SHELL_TEST_SUITE
-TEST_SUITES
+TEST_SUITE
 allowed_functions
 runchecker.bash
 prev
@@ -11,3 +11,4 @@ alias_handler.o
 alias.o
 alias_utils.o
 hsh
+backup_shell_c
